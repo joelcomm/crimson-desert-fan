@@ -596,8 +596,8 @@ function viewProgram(){
     <div class="form"><label class="wide">Program for<select id="progdate">${DAYS.map(x=>`<option value="${x.date}" ${x.date===date?"selected":""}>${fmtDate(x.date)}: ${x.sea?"At sea":esc(PORTS[x.port].name)}${SHARED.programs[x.date]?" ✓":""}</option>`).join("")}</select></label></div></div></section>`;
   if(isHost){
     html+=`<section class="panel host snap"><span class="eyebrow">Host only · posts to everyone</span>
-      <p>Photograph each page of the printed program for <b>${fmtDate(date)}</b>. You can check the result before anyone sees it.</p>
-      <div class="snap-cta">${sampleFn&&canImages?`<span class="btn sun filebtn">${d?"Re-read pages":"Snap or upload pages"}<input type="file" id="snapfile" accept="image/*" capture="environment" multiple ${busy?"disabled":""}></span>${busy?`<button class="btn ghost" data-act="stop">Stop</button>`:""}`:`<span class="status">${sampleFn===false?"Photo reading isn’t available in this view. Add events by hand below.":"Checking photo reading…"}</span>`}</div>
+      <p>Photograph the printed program for <b>${fmtDate(date)}</b>, or choose photos you already took. For a program with several pages, choose them all at once from your library. You can check the result before anyone sees it.</p>
+      <div class="snap-cta">${sampleFn&&canImages?`<span class="btn sun filebtn">Take photo<input type="file" id="snapfile" accept="image/*" capture="environment" ${busy?"disabled":""} aria-label="Take a photo of the program"></span><span class="btn ghost filebtn">Choose from library<input type="file" id="pickfile" accept="image/*" multiple ${busy?"disabled":""} aria-label="Choose program photos from your library"></span>${busy?`<button class="btn ghost" data-act="stop">Stop</button>`:""}`:`<span class="status">${sampleFn===false?"Photo reading isn’t available in this view. Add events by hand below.":"Checking photo reading…"}</span>`}</div>
       <div class="status" id="snapstatus" aria-live="polite">${busy?"Reading the program… this can take up to a minute.":""}</div>
       ${d?`<div style="width:100%" class="sec"><div class="sec-head"><h3>Draft: ${d.events.length} events <span class="pill ex">Not published</span></h3></div>
         <div class="agenda">${d.events.length?eventRows(d.events,{del:true}):`<p class="empty">No events in the draft yet.</p>`}</div>
@@ -726,7 +726,7 @@ document.addEventListener("change",e=>{
   if(el.id==="progdate"){progDate=el.value;render()}
   if(el.id==="obc"){S.spend.obc=Math.max(0,+el.value||0);save();render()}
   if(el.id==="conv-rate"){const p=PORTS[curDay().port];if(p)S.rates[p.cur]=+el.value||0;save()}
-  if(el.id==="snapfile"&&el.files&&el.files.length&&sampleFn)readPhotos(el.files);
+  if((el.id==="snapfile"||el.id==="pickfile")&&el.files&&el.files.length&&sampleFn)readPhotos(Array.from(el.files));
 });
 document.addEventListener("input",e=>{if(e.target.id==="conv-amt"||e.target.id==="conv-rate")updConv()});
 document.addEventListener("submit",e=>{
