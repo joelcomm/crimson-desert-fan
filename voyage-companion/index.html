@@ -193,6 +193,20 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
 .invite .qr svg{display:block;width:100%;height:auto}
 .invite .link{font-family:var(--f-mono);font-size:14px;overflow-wrap:anywhere}
 @media (max-width:420px){.invite{grid-template-columns:1fr}.invite .qr{width:180px}}
+.hero{display:flex;flex-direction:column;gap:10px;padding-block:6px 4px}
+.hero .eyebrow{color:var(--sea)}
+.hero h1{font-family:var(--f-display);font-weight:800;font-size:clamp(40px,12vw,60px);line-height:.9;text-transform:uppercase;letter-spacing:.01em;color:var(--board);margin:0}
+.hero .route{font-size:15px;line-height:1.5;color:var(--ink);margin:0}
+.hero .route i{font-style:normal;color:var(--sea);padding:0 4px}
+.hero .route b{font-weight:600}
+.track{position:relative;height:26px;margin:4px 6px 0}
+.track::before{content:"";position:absolute;left:0;right:0;top:11px;height:3px;border-radius:2px;background:var(--line)}
+.track .done{position:absolute;left:0;top:11px;height:3px;border-radius:2px;background:var(--sea)}
+.track .stop{position:absolute;top:6px;width:13px;height:13px;margin-left:-6.5px;border-radius:50%;background:var(--surface);border:2.5px solid var(--line)}
+.track .stop.past{border-color:var(--sea);background:var(--sea)}
+.track .stop.now{border-color:var(--sea);background:var(--surface);box-shadow:0 0 0 4px color-mix(in srgb,var(--sea) 25%,transparent)}
+.hero .meta{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.hero .meta b{color:var(--ink);font-weight:600}
 .ess .wx{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
 .ess .wx b{font-family:var(--f-display);font-weight:800;font-size:34px;line-height:1;color:var(--board)}
 .ess .facts dd{overflow-wrap:anywhere}
@@ -422,6 +436,15 @@ function qrSvg(text){
     for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(q.isDark(r,c))d+=`M${c+m} ${r+m}h1v1h-1z`;
     return `<svg viewBox="0 0 ${n+2*m} ${n+2*m}" shape-rendering="crispEdges" role="img" aria-label="QR code for ${esc(text)}"><rect width="100%" height="100%" fill="#FFFFFF"/><path d="${d}" fill="#0E2233"/></svg>`}catch(e){return ""}
 }
+function voyageHero(day){
+  const n=dayNum(day.date),frac=(n-1)/(DAYS.length-1);
+  const stops=PORT_DAYS.map(pd=>{const i=DAYS.indexOf(pd),f=i/(DAYS.length-1);const cls=pd.date<day.date?"past":pd.date===day.date?"now":"";return `<span class="stop ${cls}" style="left:${(f*100).toFixed(2)}%" title="${esc(PORTS[pd.port].name)}, ${fmtDate(pd.date)}"></span>`}).join("");
+  return `<section class="hero" aria-label="Voyage"><span class="eyebrow">Allura · 15-night transatlantic</span>
+    <h1>Pathway to Sunshine</h1>
+    <p class="route">${PORT_DAYS.map(pd=>`<b>${esc(PORTS[pd.port].name)}</b>`).join("<i>→</i>")}</p>
+    <div class="track" role="img" aria-label="Day ${n} of 16"><span class="done" style="width:${(frac*100).toFixed(2)}%"></span>${stops}</div>
+    <div class="meta"><span><b>Day ${n}</b> of 16</span><span>Nov 17 – Dec 2, 2026</span></div></section>`;
+}
 function essentials(date){
   const D=SHARED.days[date];if(!D)return "";
   const w=D.weather;
@@ -474,7 +497,7 @@ function fmtUSD(n){return "$"+n.toLocaleString("en-US",{minimumFractionDigits:0,
 /* ---------------- TODAY ---------------- */
 function viewToday(){
   const t=now(),day=curDay(),pos=position(t);
-  let html="";
+  let html=voyageHero(day);
   // board
   if(day.port){
     const p=PORTS[day.port],pt=portTimes(day);
