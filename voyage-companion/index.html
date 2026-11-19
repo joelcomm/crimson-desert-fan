@@ -2,7 +2,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
-<style>
+<style id="appcss">
 /* Layout: one-column phone app; a departure-board band for the countdown, port guide below, tab bar pinned to the bottom. */
 :root{
   --bg:#EDF2F4; --surface:#FFFFFF; --ink:#0E2233; --muted:#566977; --line:#D2DDE3;
@@ -39,6 +39,7 @@ p{margin:0}
 .small{font-size:13px}
 button,input,select,textarea{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--sea);outline-offset:2px}
+a{color:var(--sea)}
 
 /* top bar */
 .top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
@@ -188,9 +189,32 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
 .pulse{animation:pulse 2.4s ease-out infinite;transform-origin:center;transform-box:fill-box}
 @keyframes pulse{0%{opacity:.6;transform:scale(1)}100%{opacity:0;transform:scale(3)}}
+
+/* host tools and shared content */
+.host{border:1.5px dashed var(--sea);background:color-mix(in srgb,var(--sea-soft) 55%,var(--surface))}
+.host .eyebrow{color:var(--sea)}
+.notice{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--sun);border-radius:var(--r);padding:12px 14px}
+.notice p{flex:1;min-width:0;overflow-wrap:anywhere}
+.notice small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+.invite{display:grid;grid-template-columns:150px 1fr;gap:16px;align-items:center}
+.invite .qr{background:#FFFFFF;border-radius:8px;padding:8px;width:150px;max-width:100%}
+.invite .qr svg{display:block;width:100%;height:auto}
+.invite .link{font-family:var(--f-mono);font-size:14px;overflow-wrap:anywhere}
+@media (max-width:420px){.invite{grid-template-columns:1fr}.invite .qr{width:180px}}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(72px + env(safe-area-inset-bottom,0px));z-index:7;background:var(--board);color:#F2F6F8;border-radius:8px;padding:10px 14px;font-size:14px;max-width:calc(100% - 32px);box-shadow:0 6px 24px rgb(0 0 0 / .25)}
 </style>
 
-<header class="top"><div class="top-in">
+<div id="root"></div>
+<script type="application/json" id="shared">{"v":1,"updated":0,"programs":{},"notices":[],"allAboard":{},"link":""}</script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
+<script id="appjs">
+/* Page chrome, rendered from JS so the page can republish itself from constants (never from the live DOM). */
+const HEAD_BITS=`<title>Barcelona to Miami Companion</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">`;
+const SKELETON='<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>';
+const SHELL=`<header class="top"><div class="top-in">
   <div class="brand"><b>Barcelona → Miami</b><span id="sub">Allura · Nov 17 – Dec 2, 2026</span></div>
   <div class="clock"><div class="mono" id="shipclock">--:--</div><small id="shipclocklbl">Ship time</small></div>
 </div></header>
@@ -204,8 +228,9 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
   <a href="#plans" data-tab="plans"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>My plans</span></a>
   <a href="#spend" data-tab="spend"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/></svg><span>Spend</span></a>
 </div></nav>
+<div id="toast" role="status" hidden></div>`;
+document.getElementById("root").outerHTML=SHELL;
 
-<script>
 /* ---------------- Voyage data (from the public itinerary for the Nov 17, 2026 sailing) ---------------- */
 const PORTS = {
   barcelona:{name:"Barcelona",country:"Spain",tz:"Europe/Madrid",lat:41.37,lon:2.18,cur:"EUR",
@@ -358,6 +383,49 @@ let S;try{S=JSON.parse(localStorage.getItem(KEY))||defaultState()}catch(e){S=def
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 let preview=null; // a date string when the guest is previewing another day
 
+/* ---------------- shared content: posted by the host, baked into the page itself ---------------- */
+let SHARED={};try{SHARED=JSON.parse(document.getElementById("shared").textContent)||{}}catch(e){}
+SHARED={v:1,updated:0,programs:{},notices:[],allAboard:{},link:"",...SHARED};
+let isHost=false,artifactNS=null,publishing=false;
+const DKEY=KEY+"-draft";
+let draft=null;try{draft=JSON.parse(sessionStorage.getItem(DKEY))}catch(e){}
+function saveDraft(){try{draft?sessionStorage.setItem(DKEY,JSON.stringify(draft)):sessionStorage.removeItem(DKEY)}catch(e){}}
+if(draft&&!(draft.created>SHARED.updated)){draft=null;saveDraft()} // already published
+function toast(msg,ms=4000){const t=document.getElementById("toast");if(!t)return;t.textContent=msg;t.hidden=!msg;clearTimeout(toast._t);if(msg&&ms)toast._t=setTimeout(()=>t.hidden=true,ms)}
+function buildPage(data){
+  const css=document.getElementById("appcss").textContent,js=document.getElementById("appjs").textContent;
+  const json=JSON.stringify(data).replace(/</g,"\\u003c");
+  return SKELETON+"\n"+HEAD_BITS+'\n<style id="appcss">'+css+'</style>\n\n<div id="root"></div>\n<script type="application/json" id="shared">'+json+'</'+'script>\n<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></'+'script>\n<script id="appjs">'+js+'</'+'script>\n</body></html>';
+}
+/* Publish a new version of this page with updated shared content. Everyone's open copy reloads to it. */
+async function pushShared(mutate,label){
+  if(!artifactNS||publishing)return;
+  const next=JSON.parse(JSON.stringify(SHARED));mutate(next);next.updated=Date.now();
+  publishing=true;toast(label+"…",0);
+  try{await artifactNS.publish(buildPage(next));toast("Published. Everyone sees it next time they open or refresh the page.")}
+  catch(e){
+    publishing=false;const c=e&&e.code;
+    if(c==="conflict")toast("A newer version was just published. The page is reloading; your draft is kept.",6000);
+    else if(c==="not_writer"||c==="not_granted"||c==="not_declared"||c==="capability_disabled"){isHost=false;render();toast("This view can’t publish. Open the page from your own Claude account to post updates.",6000)}
+    else if(c==="rate_limited")toast("Publishing too often. Wait a minute and try again.",6000);
+    else if(c==="too_large")toast("That’s too much to publish at once. Remove a few events and try again.",6000);
+    else toast("Couldn’t publish just now. Check the ship’s Wi-Fi and try again.",6000);
+  }
+}
+function qrSvg(text){
+  if(typeof qrcode!=="function"||!text)return "";
+  try{const q=qrcode(0,"M");q.addData(text);q.make();const n=q.getModuleCount(),m=2;let d="";
+    for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(q.isDark(r,c))d+=`M${c+m} ${r+m}h1v1h-1z`;
+    return `<svg viewBox="0 0 ${n+2*m} ${n+2*m}" shape-rendering="crispEdges" role="img" aria-label="QR code for ${esc(text)}"><rect width="100%" height="100%" fill="#FFFFFF"/><path d="${d}" fill="#0E2233"/></svg>`}catch(e){return ""}
+}
+function inviteSection(){
+  if(!SHARED.link&&!isHost)return "";
+  return `<section class="sec"><h2>Share the app</h2>
+  ${SHARED.link?`<div class="panel invite"><div class="qr">${qrSvg(SHARED.link)}</div><div class="sec"><p>Scan to open this companion on another phone. No app to install.</p><p class="link" id="sharelink">${esc(SHARED.link)}</p><div><button class="btn ghost" data-act="copylink">Copy link</button></div></div></div>`:""}
+  ${isHost?`<div class="panel host sec"><span class="eyebrow">Host only</span><form class="form" id="linkform"><label class="wide">Link guests should open (paste the short link or the page’s share link)<input type="text" id="link-in" value="${esc(SHARED.link)}" placeholder="https://…" inputmode="url"></label><button class="btn" type="submit" ${publishing?"disabled":""}>Publish link and QR code</button></form></div>`:""}
+  </section>`;
+}
+
 /* ---------------- shared bits ---------------- */
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]);
 function now(){return preview?shipInstant(preview,"10:00"):Date.now()}
@@ -379,7 +447,8 @@ function viewToday(){
   // board
   if(day.port){
     const p=PORTS[day.port],pt=portTimes(day);
-    const allAboard=pt.dep?pt.dep-30*60000:null;
+    const posted=SHARED.allAboard[day.date];
+    const allAboard=posted?zoned(day.date,posted,p.tz):pt.dep?pt.dep-30*60000:null;
     const shipOff=shipOffset(t),locOff=tzOffset(t,p.tz);
     let main="";
     if(day.port==="miami"){
@@ -402,7 +471,7 @@ function viewToday(){
         <div><small>Local now</small><span class="mono">${fmtTZ(t,p.tz)}</span></div>
       </div>
       ${shipOff!==locOff?`<div class="alert"><span>⚠</span><span>Ship time and local time differ by <b>${Math.abs(shipOff-locOff)/60} hour</b>. Port times above are <b>local</b>. Check which clock your phone is showing.</span></div>`:""}
-      <p class="small" style="color:var(--board-dim)">All aboard is usually 30 minutes before departure. Confirm it in the daily program.</p>
+      <p class="small" style="color:var(--board-dim)">${posted?"All-aboard time as printed in the daily program.":"All aboard is usually 30 minutes before departure. Confirm it in the daily program."}</p>
     </section>`;
   }else{
     const s=seaIndex(day.date),nx=nextPortAfter(day.date),np=PORTS[nx.port];
@@ -417,6 +486,14 @@ function viewToday(){
         <div><small>To go</small><span class="mono">≈${Math.round((pos.toGo??0)/10)*10} nm</span></div>
         <div><small>Position</small><span class="mono">${fmtPos(pos.pos)}</span></div>
       </div>
+    </section>`;
+  }
+  const notes=[...SHARED.notices].sort((a,b)=>b.at-a.at);
+  if(notes.length)html+=`<section class="sec" aria-label="Notices">${notes.map(n=>`<div class="notice"><p>${esc(n.text)}<small>Posted ${fmtDate(n.date)} · ${esc(n.time||"")}</small></p>${isHost?`<button class="x" data-delnote="${esc(n.id)}" aria-label="Remove notice" ${publishing?"disabled":""}>×</button>`:""}</div>`).join("")}</section>`;
+  if(isHost){
+    html+=`<section class="panel host sec"><span class="eyebrow">Host only · posts to everyone</span>
+    <form class="form" id="noteform"><label class="wide">Post a notice<input type="text" id="note-in" maxlength="240" placeholder="e.g. Tender tickets from 8:00 in the theatre"></label><button class="btn" type="submit" ${publishing?"disabled":""}>Post notice</button></form>
+    ${day.port&&day.dep?`<form class="form" id="aaform"><label>All aboard in ${esc(PORTS[day.port].name)} (local)<input type="time" id="aa-in" value="${esc(SHARED.allAboard[day.date]||"")}"></label><button class="btn ghost" type="submit" ${publishing?"disabled":""}>Publish all-aboard time</button></form>`:""}
     </section>`;
   }
   const cc=clockChangeOn(day.date);
@@ -502,51 +579,69 @@ function viewVoyage(){
     const times=d.sea?"":`<span class="mono">${d.arr?d.arr:"Embark"} – ${d.dep?d.dep:"Disembark"}</span>`;
     return `<li class="${cls}"><div class="d"><b>${p.mon} ${p.day}</b>${p.dow}</div><div class="rail"><i></i></div><div class="c"><b>${title}</b>${d.kind?` <span class="pill">${d.kind}</span>`:""}${d.date===today?` <span class="pill sun">${preview?"Previewing":"Today"}</span>`:""}<br>${times}${cc?`<span class="clk">Clocks back 1 hour tonight (expected)</span>`:""}</div></li>`}).join("")}</ol></div>
   <p class="small muted">Times are local and come from the public itinerary for the November 17, 2026 sailing. Ports and times can change; the ship’s daily program has the final word.</p></section>`;
-  return html;
+  return html+inviteSection();
 }
 
 /* ---------------- PROGRAM ---------------- */
 let progDate=null,sampleFn=null,canImages=false,busy=null;
+const exampleEvents=()=>EXAMPLE_PROGRAM.map((e,i)=>({...e,id:"ex"+i}));
+function eventRows(events,{star,del,date}){
+  const starredIds=new Set(S.plans.filter(p=>p.ev&&p.date===date).map(p=>p.ev));
+  return events.map(e=>{const c=CATS[e.cat]||CATS.other;const on=starredIds.has(e.id);
+    return `<div class="row"><div class="t">${esc(e.time||"—")}${e.end?`<small>to ${esc(e.end)}</small>`:""}</div><div class="body"><b>${esc(e.title)}</b><span><i class="catdot" style="background:${c[1]}"></i>${esc(c[0])}${e.venue?" · "+esc(e.venue):""}</span></div>${
+      star?`<button class="star" aria-pressed="${on}" aria-label="${on?"Remove from":"Add to"} my day: ${esc(e.title)}" data-star="${esc(e.id)}">${STAR}</button>`:
+      del?`<button class="x" data-deldraft="${esc(e.id)}" aria-label="Remove ${esc(e.title)} from the draft">×</button>`:""}</div>`}).join("");
+}
+function programFor(date){
+  if(SHARED.programs[date])return {events:SHARED.programs[date].events,kind:"posted"};
+  if(!Object.keys(SHARED.programs).length)return {events:exampleEvents(),kind:"example"};
+  return {events:[],kind:"none"};
+}
 function viewProgram(){
-  const date=progDate||curDay().date;
-  const pr=S.programs[date];
-  const events=pr?pr.events:EXAMPLE_PROGRAM.map((e,i)=>({...e,id:"ex"+i}));
-  const starredIds=new Set(S.plans.filter(p=>p.date===date&&p.ev).map(p=>p.ev));
+  const date=progDate||curDay().date,pr=programFor(date),d=draft&&draft.date===date?draft:null;
   let html=`<section class="sec"><div class="sec-head"><h2>Daily program</h2></div>
-  <div class="panel snap">
-    <p>Photograph the printed program that arrives in your stateroom each evening. The events show up here and you can star the ones you want.</p>
-    <div class="form" style="width:100%"><label class="wide">Program for<select id="progdate">${DAYS.map(d=>`<option value="${d.date}" ${d.date===date?"selected":""}>${fmtDate(d.date)}: ${d.sea?"At sea":esc(PORTS[d.port].name)}</option>`).join("")}</select></label></div>
-    <div class="snap-cta" id="snapcta">${sampleFn&&canImages?`<span class="btn sun filebtn">Snap or upload pages<input type="file" id="snapfile" accept="image/*" capture="environment" multiple ${busy?"disabled":""}></span>${busy?`<button class="btn ghost" data-act="stop">Stop</button>`:""}`:`<span class="status">${sampleFn===false?"Reading photos works when this page is opened in Claude. You can add events by hand below.":"Checking whether photo reading is available…"}</span>`}</div>
-    <div class="status" id="snapstatus" aria-live="polite"></div>
-  </div></section>`;
-  html+=`<section class="sec"><div class="sec-head"><h3>${fmtDate(date)} ${pr?`<span class="pill">${pr.source==="photo"?"From your photo":"Added by you"}</span>`:`<span class="pill ex">Example program</span>`}</h3>${pr?`<button class="linkbtn" data-act="clearprog">Clear this day</button>`:""}</div>
-  ${!pr?`<p class="small muted">This is a sample of what a sea-day program looks like. Snap tonight’s to replace it.</p>`:""}
-  <div class="panel"><div class="agenda">${events.length?events.map(e=>{const c=CATS[e.cat]||CATS.other;const on=starredIds.has(e.id);return `<div class="row"><div class="t">${esc(e.time||"—")}${e.end?`<small>to ${esc(e.end)}</small>`:""}</div><div class="body"><b>${esc(e.title)}</b><span><i class="catdot" style="background:${c[1]}"></i>${esc(c[0])}${e.venue?" · "+esc(e.venue):""}</span></div><button class="star" aria-pressed="${on}" aria-label="${on?"Remove from":"Add to"} my day: ${esc(e.title)}" data-star="${esc(e.id)}" ${pr?"":"data-example=1"}>${STAR}</button></div>`}).join(""):`<p class="empty">No events read from that photo. Try a sharper, flatter shot.</p>`}</div>
-  <details class="add" style="margin-top:10px"><summary>+ Add an event by hand</summary>
-    <form class="form" id="evform"><label>Time<input type="time" id="ev-time" required></label><label>Category<select id="ev-cat">${Object.entries(CATS).map(([k,v])=>`<option value="${k}">${v[0]}</option>`).join("")}</select></label><label class="wide">Event<input type="text" id="ev-title" required placeholder="e.g. Wine tasting"></label><label class="wide">Where<input type="text" id="ev-venue" placeholder="Venue"></label><button class="btn" type="submit">Add event</button></form>
-  </details></div></section>`;
+  <div class="panel sec"><p>Everything on the ship’s printed program, posted each evening for the next day. Star what you like and it appears in <a href="#today">Your day</a>.</p>
+    <div class="form"><label class="wide">Program for<select id="progdate">${DAYS.map(x=>`<option value="${x.date}" ${x.date===date?"selected":""}>${fmtDate(x.date)}: ${x.sea?"At sea":esc(PORTS[x.port].name)}${SHARED.programs[x.date]?" ✓":""}</option>`).join("")}</select></label></div></div></section>`;
+  if(isHost){
+    html+=`<section class="panel host snap"><span class="eyebrow">Host only · posts to everyone</span>
+      <p>Photograph each page of the printed program for <b>${fmtDate(date)}</b>. You can check the result before anyone sees it.</p>
+      <div class="snap-cta">${sampleFn&&canImages?`<span class="btn sun filebtn">${d?"Re-read pages":"Snap or upload pages"}<input type="file" id="snapfile" accept="image/*" capture="environment" multiple ${busy?"disabled":""}></span>${busy?`<button class="btn ghost" data-act="stop">Stop</button>`:""}`:`<span class="status">${sampleFn===false?"Photo reading isn’t available in this view. Add events by hand below.":"Checking photo reading…"}</span>`}</div>
+      <div class="status" id="snapstatus" aria-live="polite">${busy?"Reading the program… this can take up to a minute.":""}</div>
+      ${d?`<div style="width:100%" class="sec"><div class="sec-head"><h3>Draft: ${d.events.length} events <span class="pill ex">Not published</span></h3></div>
+        <div class="agenda">${d.events.length?eventRows(d.events,{del:true}):`<p class="empty">No events in the draft yet.</p>`}</div>
+        <div class="snap-cta"><button class="btn" data-act="publish-draft" ${publishing||!d.events.length?"disabled":""}>Publish to everyone</button><button class="btn ghost" data-act="discard-draft">Discard draft</button></div></div>`:""}
+      <details class="add" style="width:100%"><summary>+ Add an event by hand${d?"":" (starts a draft)"}</summary>
+        <form class="form" id="evform"><label>Time<input type="time" id="ev-time" required></label><label>Category<select id="ev-cat">${Object.entries(CATS).map(([k,v])=>`<option value="${k}">${v[0]}</option>`).join("")}</select></label><label class="wide">Event<input type="text" id="ev-title" required placeholder="e.g. Wine tasting"></label><label class="wide">Where<input type="text" id="ev-venue" placeholder="Venue"></label><button class="btn ghost" type="submit">Add to draft</button></form>
+      </details>
+      ${SHARED.programs[date]&&!d?`<button class="linkbtn" data-act="unpublish">Remove the posted program for this day</button>`:""}
+    </section>`;
+  }
+  html+=`<section class="sec"><div class="sec-head"><h3>${fmtDate(date)} ${pr.kind==="posted"?`<span class="pill">Posted</span>`:pr.kind==="example"?`<span class="pill ex">Example program</span>`:""}</h3></div>
+  ${pr.kind==="example"?`<p class="small muted">A sample of what a sea-day program looks like. The real ones appear here once they’re posted.</p>`:""}
+  <div class="panel"><div class="agenda">${pr.events.length?eventRows(pr.events,{star:true,date}):`<p class="empty">${date>shipParts(Date.now()).date?"Not posted yet. Each day’s program usually goes up the evening before.":"No program was posted for this day."}</p>`}</div></div></section>`;
   return html;
 }
 async function readPhotos(files){
   const date=progDate||curDay().date;
   const ctl=new AbortController();busy=ctl;render();
-  const st=document.getElementById("snapstatus");st.className="status";st.textContent="Reading the program… this can take up to a minute.";
   const prompt=`These ${files.length>1?files.length+" photos are pages":"photo is a page"} of a cruise ship's printed daily program for ${fmtDate(date)}, 2026.
 Extract every scheduled activity, meal service, show, talk, class, game and port-related announcement that has a time.
 Reply with only JSON in this shape:
-{"events":[{"time":"HH:MM","end":"HH:MM or null","title":"short name","venue":"venue or null","cat":"food|talk|show|fitness|social|port|other"}]}
-Use 24-hour times. Sort by time. Keep titles short (under 60 characters). Skip advertisements and venue opening-hours tables unless they describe a timed event. If an all-aboard time, clock change or port agent phone number is printed, include it as an event with cat "port". If the photo is unreadable, return {"events":[]}.`;
+{"events":[{"time":"HH:MM","end":"HH:MM or null","title":"short name","venue":"venue or null","cat":"food|talk|show|fitness|social|port|other"}],"allAboard":"HH:MM or null"}
+Use 24-hour times. Sort by time. Keep titles short (under 60 characters). Skip advertisements and venue opening-hours tables unless they describe a timed event. Include clock changes and port announcements with cat "port". Do not include personal names, phone numbers or stateroom numbers. Put the printed all-aboard time in "allAboard" if there is one. If the photo is unreadable, return {"events":[],"allAboard":null}.`;
+  let msg="";
   try{
     const res=await sampleFn.json(prompt,{images:Array.from(files).slice(0,8),signal:ctl.signal});
-    const evs=(res&&Array.isArray(res.events)?res.events:[]).filter(e=>e&&e.title).map(e=>({id:uid(),time:/^\d{1,2}:\d{2}$/.test(e.time||"")?e.time.padStart(5,"0"):"",end:/^\d{1,2}:\d{2}$/.test(e.end||"")?e.end.padStart(5,"0"):null,title:String(e.title).slice(0,90),venue:e.venue?String(e.venue).slice(0,60):null,cat:CATS[e.cat]?e.cat:"other"})).sort((a,b)=>a.time.localeCompare(b.time));
-    S.programs[date]={source:"photo",events:evs};save();busy=null;render();
-    const s2=document.getElementById("snapstatus");if(s2)s2.textContent=`Found ${evs.length} events. Tap the star on anything you want in your day.`;
+    const hhmm=v=>/^\d{1,2}:\d{2}$/.test(v||"")?String(v).padStart(5,"0"):null;
+    const evs=(res&&Array.isArray(res.events)?res.events:[]).filter(e=>e&&e.title).map(e=>({id:uid(),time:hhmm(e.time)||"",end:hhmm(e.end),title:String(e.title).slice(0,90),venue:e.venue?String(e.venue).slice(0,60):null,cat:CATS[e.cat]?e.cat:"other"})).sort((a,b)=>a.time.localeCompare(b.time));
+    draft={date,events:evs,allAboard:hhmm(res&&res.allAboard),created:Date.now()};saveDraft();
+    msg=evs.length?`Read ${evs.length} events${draft.allAboard?` and all aboard at ${draft.allAboard}`:""}. Check them, remove anything wrong, then publish.`:"No events could be read. Try a sharper, flatter photo.";
   }catch(e){
-    busy=null;render();const s2=document.getElementById("snapstatus");if(!s2)return;s2.className="status err";
-    const msg={cancelled:"",not_granted:"Photo reading needs your OK to use Claude. You can add events by hand below.",sampling_disabled:"Photo reading isn't available on this account.",rate_limited:"Too many requests just now. Try again in a few minutes.",image_rejected:"That file couldn't be read. Try a JPEG or PNG photo.",invalid_json:"The photo was read, but the result came back garbled. Try again, or try a flatter photo.",refused:"That photo couldn't be processed. Try another shot.",images_unavailable:"Photos can't be sent from this view. Add events by hand below."}[e&&e.code];
-    s2.textContent=msg??"Something interrupted the reading. Check the connection and try again.";
-    if(e&&["not_granted","sampling_disabled","images_unavailable"].includes(e.code)){canImages=false;sampleFn=false;render()}
+    const c=e&&e.code;
+    msg={cancelled:"",not_granted:"Photo reading needs your OK to use Claude.",sampling_disabled:"Photo reading isn’t available on this account.",rate_limited:"Too many requests just now. Try again in a few minutes.",image_rejected:"That file couldn’t be read. Try a JPEG or PNG photo.",invalid_json:"The photo was read, but the result came back garbled. Try again.",refused:"That photo couldn’t be processed. Try another shot.",images_unavailable:"Photos can’t be sent from this view."}[c]??"Something interrupted the reading. Check the connection and try again.";
+    if(["not_granted","sampling_disabled","images_unavailable"].includes(c)){canImages=false;sampleFn=false}
   }
+  busy=null;render();const s2=document.getElementById("snapstatus");if(s2)s2.textContent=msg;
 }
 
 /* ---------------- PLANS ---------------- */
@@ -593,7 +688,7 @@ const VIEWS={today:viewToday,voyage:viewVoyage,program:viewProgram,plans:viewPla
 function tab(){const h=location.hash.slice(1);return VIEWS[h]?h:"today"}
 function render(){
   const tb=tab();
-  document.getElementById("app").innerHTML=VIEWS[tb]()+`<footer>An independent guest-made companion for this voyage. Not affiliated with or endorsed by Oceania Cruises. Your plans and notes stay on this device. Itinerary from public listings and subject to change.</footer>`;
+  document.getElementById("app").innerHTML=VIEWS[tb]()+`<footer>An independent guest-made companion for this voyage. Not affiliated with or endorsed by Oceania Cruises. Daily programs and notices are posted by a fellow guest from the printed copies. Your plans, stars and spending stay on this device. Itinerary from public listings and subject to change.</footer>`;
   document.querySelectorAll("nav.tabs a").forEach(a=>a.setAttribute("aria-current",a.dataset.tab===tb?"page":"false"));
   updConv();tick();
   const mb=document.querySelector(".mapbox"),ship=mb&&mb.querySelector("circle.pulse");
@@ -614,14 +709,19 @@ document.addEventListener("click",e=>{
   const act=b.dataset.act;
   if(act==="live"){preview=null;render()}
   if(act==="stop"&&busy){busy.abort()}
-  if(act==="clearprog"){delete S.programs[progDate||curDay().date];save();render()}
+  if(act==="copylink"){const txt=SHARED.link;const done=()=>toast("Link copied.");try{navigator.clipboard.writeText(txt).then(done,()=>{selectText("sharelink")})}catch(_){selectText("sharelink")}}
+  if(act==="discard-draft"){draft=null;saveDraft();render()}
+  if(act==="publish-draft"&&draft){const d=draft;pushShared(n=>{n.programs[d.date]={events:d.events,at:Date.now()};if(d.allAboard&&dayOf(d.date)&&dayOf(d.date).port)n.allAboard[d.date]=d.allAboard},`Publishing the program for ${fmtDate(d.date)}`)}
+  if(act==="unpublish"){const date=progDate||curDay().date;pushShared(n=>{delete n.programs[date]},"Removing the program")}
+  if(b.dataset.deldraft&&draft){draft.events=draft.events.filter(x=>x.id!==b.dataset.deldraft);saveDraft();render()}
+  if(b.dataset.delnote){const id=b.dataset.delnote;pushShared(n=>{n.notices=n.notices.filter(x=>x.id!==id)},"Removing the notice")}
   if(act==="clearex-plans"){S.plans=S.plans.filter(p=>!p.ex);save();render()}
   if(act==="clearex-spend"){S.spend.items=S.spend.items.filter(p=>!p.ex);save();render()}
   if(b.dataset.star){
     const date=progDate||curDay().date,id=b.dataset.star;
     const existing=S.plans.find(p=>p.ev===id&&p.date===date);
     if(existing)S.plans=S.plans.filter(p=>p!==existing);
-    else{const src=S.programs[date]?S.programs[date].events:EXAMPLE_PROGRAM.map((x,i)=>({...x,id:"ex"+i}));const ev=src.find(x=>x.id===id);if(ev)S.plans.push({id:uid(),date,time:ev.time,title:ev.title,type:"Program",where:ev.venue||"",ev:id,ex:!S.programs[date]})}
+    else{const pr=programFor(date);const ev=pr.events.find(x=>x.id===id);if(ev)S.plans.push({id:uid(),date,time:ev.time,title:ev.title,type:"Program",where:ev.venue||"",ev:id,ex:pr.kind==="example"})}
     save();render();
   }
   if(b.dataset.delplan){S.plans=S.plans.filter(p=>p.id!==b.dataset.delplan);save();render()}
@@ -641,19 +741,27 @@ document.addEventListener("submit",e=>{
   e.preventDefault();const f=e.target,v=id=>document.getElementById(id).value.trim();
   if(f.id==="planform"){if(!v("pl-title"))return;S.plans.push({id:uid(),date:v("pl-date"),time:v("pl-time"),title:v("pl-title"),type:v("pl-type"),where:v("pl-where")});save();render()}
   if(f.id==="spendform"){const a=parseFloat(v("sp-amt"));if(!(a>=0))return;S.spend.items.push({id:uid(),date:v("sp-date"),amount:a,cat:v("sp-cat"),note:v("sp-note")});save();render()}
-  if(f.id==="evform"){const date=progDate||curDay().date;if(!v("ev-title"))return;const pr=S.programs[date]||{source:"manual",events:[]};pr.events.push({id:uid(),time:v("ev-time"),end:null,title:v("ev-title"),venue:v("ev-venue")||null,cat:v("ev-cat")});pr.events.sort((a,b)=>a.time.localeCompare(b.time));S.programs[date]=pr;save();render()}
+  if(f.id==="evform"&&isHost){const date=progDate||curDay().date;if(!v("ev-title"))return;
+    if(!draft||draft.date!==date)draft={date,events:SHARED.programs[date]?JSON.parse(JSON.stringify(SHARED.programs[date].events)):[],allAboard:null,created:Date.now()};
+    draft.events.push({id:uid(),time:v("ev-time"),end:null,title:v("ev-title"),venue:v("ev-venue")||null,cat:v("ev-cat")});draft.events.sort((a,b)=>a.time.localeCompare(b.time));draft.created=Date.now();saveDraft();render()}
+  if(f.id==="noteform"&&isHost){const txt=v("note-in").slice(0,240);if(!txt)return;const sp=shipParts(Date.now());pushShared(n=>{n.notices.push({id:uid(),text:txt,date:sp.date,time:sp.time,at:Date.now()});n.notices=n.notices.slice(-12)},"Posting the notice")}
+  if(f.id==="aaform"&&isHost){const date=curDay().date,val=v("aa-in");pushShared(n=>{if(val)n.allAboard[date]=val;else delete n.allAboard[date]},"Publishing the all-aboard time")}
+  if(f.id==="linkform"&&isHost){const val=v("link-in");if(val&&!/^https?:\/\//i.test(val)){toast("Links need to start with https://");return}pushShared(n=>{n.link=val},"Publishing the link")}
 });
 window.addEventListener("hashchange",()=>{render();window.scrollTo(0,0)});
 setInterval(()=>{const a=document.activeElement;if(tab()==="today"&&!preview&&curDay().date!==(window.__lastDay)){window.__lastDay=curDay().date;if(!a||!/INPUT|SELECT|TEXTAREA/.test(a.tagName))render()}else tick()},20000);
 window.__lastDay=curDay().date;
 render();
 
-/* Photo reading through Claude, when this view offers it */
+function selectText(id){const el=document.getElementById(id);if(!el)return;const r=document.createRange();r.selectNodeContents(el);const sel=getSelection();sel.removeAllRanges();sel.addRange(r);toast("Link selected. Copy it from the menu.")}
+
+/* Who is viewing: the page's owner gets host tools; everyone else gets the read-only guest view. */
 (async()=>{
-  try{
-    const s=window.claude?await window.claude.use("sample"):null;
-    if(s){const lim=await s.limits().catch(()=>null);sampleFn=s;canImages=!!(lim&&lim.images);if(!canImages)sampleFn=false}else sampleFn=false;
-  }catch(e){sampleFn=false}
-  if(tab()==="program")render();
+  const c=window.claude;
+  const [u,a,s]=c?await Promise.all(["user","artifact","sample"].map(n=>c.use(n).catch(()=>null))):[null,null,null];
+  try{isHost=!!(u&&a&&await u.canEdit())}catch(e){isHost=false}
+  artifactNS=isHost?a:null;
+  if(isHost&&s){const lim=await s.limits().catch(()=>null);sampleFn=s;canImages=!!(lim&&lim.images);if(!canImages)sampleFn=false}else sampleFn=false;
+  const el=document.activeElement;if(!el||!/INPUT|SELECT|TEXTAREA/.test(el.tagName))render();
 })();
 </script>
