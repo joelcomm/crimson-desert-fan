@@ -193,11 +193,23 @@ footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);paddin
 .invite .qr svg{display:block;width:100%;height:auto}
 .invite .link{font-family:var(--f-mono);font-size:14px;overflow-wrap:anywhere}
 @media (max-width:420px){.invite{grid-template-columns:1fr}.invite .qr{width:180px}}
+.ess .wx{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.ess .wx b{font-family:var(--f-display);font-weight:800;font-size:34px;line-height:1;color:var(--board)}
+.ess .facts dd{overflow-wrap:anywhere}
+.hours{display:grid;grid-template-columns:1fr auto;gap:6px 14px;margin:0}
+.hours dt{min-width:0}
+.hours dd{margin:0;font-family:var(--f-mono);font-size:14px;text-align:right;white-space:nowrap}
+.hours dd.closed{color:var(--warn)}
+details.box>summary{cursor:pointer;font-weight:600;list-style:none;display:flex;justify-content:space-between;gap:8px}
+details.box>summary::-webkit-details-marker{display:none}
+details.box>summary::after{content:"+";color:var(--sea);font-weight:600}
+details.box[open]>summary::after{content:"−"}
+details.box[open]>summary{margin-bottom:10px}
 #toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(72px + env(safe-area-inset-bottom,0px));z-index:7;background:var(--board);color:#FFFFFF;border-radius:8px;padding:10px 14px;font-size:14px;max-width:calc(100% - 32px);box-shadow:0 6px 24px rgb(0 0 0 / .25)}
 </style>
 
 <div id="root"></div>
-<script type="application/json" id="shared">{"v":1,"updated":0,"programs":{},"notices":[],"allAboard":{},"link":""}</script>
+<script type="application/json" id="shared">{"v": 1, "updated": 1795111759705, "programs": {"2026-11-19": {"events": [{"time": "07:00", "title": "In port: docking in Málaga", "venue": null, "cat": "port", "id": "lqq96j7", "end": null}, {"time": "09:15", "title": "Shuffleboard (weather permitting)", "venue": "Sports Deck Aft (15)", "cat": "fitness", "id": "e4gj350", "end": null}, {"time": "10:15", "title": "Table tennis (weather permitting)", "venue": "Sports Deck Fwd (15)", "cat": "fitness", "id": "bs5kxys", "end": null}, {"time": "11:15", "title": "Indoor bocce ball", "venue": "Martinis (6)", "cat": "social", "id": "i52aorh", "end": null}, {"time": "13:30", "end": "16:00", "title": "Social bridge play (non-hosted)", "venue": "Polo Grill (14)", "cat": "social", "id": "tf8t6ne"}, {"time": "13:30", "end": "16:00", "title": "Mah jongg play (non-hosted)", "venue": "Toscana (14)", "cat": "social", "id": "21d3dh6"}, {"time": "14:30", "title": "Indoor golf challenge", "venue": "Atrium (5)", "cat": "social", "id": "9rzfp7n", "end": null}, {"time": "15:30", "end": "16:30", "title": "Afternoon tea with the Primavera String Quartet", "venue": "Horizons (14)", "cat": "food", "id": "5f0hsve"}, {"time": "15:30", "title": "Indoor baggo bean toss", "venue": "Martinis (6)", "cat": "social", "id": "qv7zta8", "end": null}, {"time": "16:00", "title": "Pickleball & paddle tennis (non-hosted, weather permitting)", "venue": "Sports Deck Fwd (16)", "cat": "fitness", "id": "6wwsfkb", "end": null}, {"time": "16:30", "title": "Team trivia with the Cruise Director (max 8 per team)", "venue": "Allura Lounge (5)", "cat": "social", "id": "qe64utc", "end": null}, {"time": "17:00", "title": "Mensa daily quiz answers revealed", "venue": "Allura Lounge (5)", "cat": "social", "id": "im2xc9o", "end": null}, {"time": "17:00", "title": "Friends of Bill W (non-hosted)", "venue": "Terrace Café Stbd (12)", "cat": "other", "id": "gacuzvl", "end": null}, {"time": "17:30", "end": "19:00", "title": "Captain’s Cocktail Celebration. Officers introduced at 18:00; proper attire", "venue": "Horizons (14)", "cat": "show", "id": "by0v8rz"}, {"time": "17:30", "end": "18:15", "title": "Primavera String Quartet", "venue": "Grand Lounge (6)", "cat": "show", "id": "crnltlv"}, {"time": "17:30", "end": "18:15", "title": "Cool Vibes with Alex at the piano", "venue": "Martinis (6)", "cat": "show", "id": "7ks6l88"}, {"time": "18:30", "end": "21:00", "title": "Chef’s Market Dinner: Spain", "venue": "Terrace Café (12)", "cat": "food", "id": "p1gm6ft"}, {"time": "18:30", "end": "19:00", "title": "Keys & Cocktails with Alex at the piano", "venue": "Martinis (6)", "cat": "show", "id": "xi57hmi"}, {"time": "18:30", "title": "ALL ABOARD: everyone back on the ship", "venue": null, "cat": "port", "id": "51x1m63", "end": null}, {"time": "19:00", "title": "Sail away for Agadir, Morocco (508 nautical miles)", "venue": null, "cat": "port", "id": "d1n96mi", "end": null}, {"time": "19:15", "end": "20:00", "title": "Libations & music with the Curcuma Duo", "venue": "Martinis (6)", "cat": "show", "id": "ygxwioa"}, {"time": "19:30", "end": "21:00", "title": "Spot the Difference: find the real diamond", "venue": "Boutique (5)", "cat": "social", "id": "9uikllt"}, {"time": "19:30", "end": "20:00", "title": "Primavera String Quartet", "venue": "Grand Lounge (6)", "cat": "show", "id": "iexcrav"}, {"time": "20:15", "end": "21:00", "title": "Classical Reflections with the Primavera String Quartet", "venue": "Grand Lounge (6)", "cat": "show", "id": "wot8lay"}, {"time": "20:15", "end": "21:00", "title": "Good Vibes & Party Classics with the Curcuma Duo", "venue": "Martinis (6)", "cat": "show", "id": "r1k4e8a"}, {"time": "20:15", "title": "Evening team trivia (max 8 per team)", "venue": "Horizons (14)", "cat": "social", "id": "j3u0dm9", "end": null}, {"time": "20:30", "end": "21:30", "title": "Scent Challenge: name the fragrance", "venue": "Boutique (5)", "cat": "social", "id": "qb86ioz"}, {"time": "20:45", "end": "21:30", "title": "The Soul Inspiration Duo", "venue": "Horizons (14)", "cat": "show", "id": "x9x7m5l"}, {"time": "21:00", "end": "22:30", "title": "Happy hour: 2-for-1 cocktails in Horizons, Grand Lounge, Founders Bar & Martinis", "venue": null, "cat": "food", "id": "jsqzubn"}, {"time": "21:15", "title": "Piano Legends: the hits of Billy Joel & Elton John, starring Alex Gnatovych", "venue": "Allura Lounge (5)", "cat": "show", "id": "cq5z0b2", "end": null}, {"time": "21:30", "end": "22:30", "title": "Birthstones: their history and symbolism", "venue": "Boutique (5)", "cat": "talk", "id": "wc9lknh"}, {"time": "22:00", "title": "80’s & 90’s Favorites with the Soul Inspiration Duo (until late)", "venue": "Horizons (14)", "cat": "show", "id": "efhuwwf", "end": null}, {"time": "22:15", "end": "23:00", "title": "A nightcap & music with the Curcuma Duo (again 23:15 till late)", "venue": "Martinis (6)", "cat": "show", "id": "ichd5fd"}, {"time": "02:15", "title": "NFL: Colts vs. Texans, early Friday (satellite permitting)", "venue": "TV channel 46", "cat": "other", "id": "1w1nnt2", "end": null}], "at": 1795111759705}}, "notices": [], "allAboard": {"2026-11-19": "18:30"}, "link": "", "days": {"2026-11-19": {"weather": {"desc": "Partly sunny", "hiF": 71, "loF": 61, "hiC": 22, "loC": 16}, "facts": [["All aboard", "18:30. Departure 19:00 for Agadir"], ["Pier", "Muelle de Levante, Terminal B"], ["Shuttle", "Free port shuttle to Plaza de la Marina from 07:30. Last bus back to the ship at 18:00. First come, first served."], ["Take ashore", "Your World Card (cruise card)"], ["Port agent", "Intercruises Port Ops Spain · mobile +34 675 873 097 · tel +34 616 455 170"], ["Dress tonight", "Proper attire for the Captain’s Cocktail Celebration, 17:30–19:00 in Horizons (14)"], ["Onboard", "Emergency 999 · Medical Center 4400 · Reception 00"]], "notes": ["A 10% Spanish tax is added to drinks bought onboard until the ship is 12 miles off the coast.", "The women’s steam room in the Aquamar Spa is closed today and reopens November 20.", "Local tourist information is available onboard 07:30–11:30.", "Specialty dining reservations: Reservation Desk, Deck 5, 08:00–17:00."], "tours": [{"code": "AGP-017", "name": "The Majestic Town of Ronda", "time": "07:45", "where": "Allura Lounge (5)"}, {"code": "AGP-018", "name": "Granada: The Soul of Andalucia", "time": "07:45", "where": "Allura Lounge (5)"}, {"code": "AGP-001", "name": "Málaga City Highlights (1st departure)", "time": "08:45", "where": "Allura Lounge (5)"}, {"code": "AGP-008", "name": "Granada on Your Own", "time": "08:45", "where": "Allura Lounge (5)"}, {"code": "AGP-AC1", "name": "Accessible Málaga Cathedral & Roman Amphitheater", "time": "08:45", "where": "Allura Lounge (5)"}, {"code": "AGP-1CT", "name": "Chef-Led Market Foraging & Culinary Experience", "time": "09:00", "where": "Culinary Center (14)"}, {"code": "AGP-001OEA", "name": "Oceania Exclusive: Málaga City Highlights", "time": "09:15", "where": "Allura Lounge (5)"}, {"code": "AGP-001A", "name": "Málaga City Highlights (2nd departure)", "time": "09:45", "where": "Allura Lounge (5)"}, {"code": "AGP-015", "name": "Panoramic Málaga", "time": "09:45", "where": "Allura Lounge (5)"}, {"code": "AGP-025", "name": "Málaga Gastronomy Route", "time": "09:45", "where": "Allura Lounge (5)"}, {"code": "AGP-031", "name": "Treasure Caves & Wine Tasting", "time": "09:45", "where": "Allura Lounge (5)"}, {"code": "AGP-030A", "name": "Picasso & the Art of Dining", "time": "10:15", "where": "Allura Lounge (5)"}, {"code": "AGP-046A", "name": "Flamenco Show & Tapas", "time": "10:15", "where": "Allura Lounge (5)"}], "hours": {"Restaurants": [["Breakfast in-suite", "06:30–10:30"], ["Coffee Corner · Horizons (14)", "06:30–11:00"], ["Breakfast · Waves Grill (12)", "06:30–10:30"], ["Breakfast · Aquamar Kitchen (12)", "07:00–10:00"], ["Breakfast buffet · Terrace Café (12)", "07:00–10:00"], ["Breakfast · Grand Dining Room (6)", "08:00–09:30"], ["Crêperie (14)", "11:00–18:00"], ["Lunch · Waves Grill (12)", "11:30–16:00"], ["Lunch · Aquamar Kitchen (12)", "11:00–15:00"], ["Mexican lunch buffet · Terrace Café (12)", "12:00–14:00"], ["Lunch · Grand Dining Room (6)", "Closed"], ["Chef’s Market Dinner: Spain · Terrace Café (12)", "18:30–21:00"], ["Pizzeria · Waves Grill (12)", "18:30–21:00"], ["Dinner · Grand Dining Room (6)", "18:30–21:30"], ["Jacques (5), Red Ginger (5), Polo Grill (14), Toscana (14) · reservation only", "18:30–21:00"]], "Bars": [["Baristas & Bakery (14)", "06:30–18:00"], ["Horizons (14)", "15:00–close"], ["Waves Bar (12)", "10:00–close"], ["Founders Bar (6)", "16:00–close"], ["Martinis (6)", "15:00–close"]], "Services": [["Reception (5)", "24 hours"], ["Destination Services (5)", "07:15–11:00 · 16:00–20:00"], ["Concierge (5)", "08:00–12:00 · 16:00–20:00"], ["Concierge Lounge (9)", "08:00–12:00 · 16:00–20:00"], ["Executive Lounge (11)", "08:00–12:00 · 16:00–20:00"], ["Future Cruise Sales (6)", "08:00–11:00 · 16:00–19:00"], ["Boutique (5)", "07:30–23:00"], ["Casino (6)", "Slots & tables 20:00–close"], ["Aquamar Spa + Vitality Center (15)", "08:00–22:00"], ["Fitness Center (15)", "24 hours"], ["Pool (12), weather permitting", "07:00–22:00"], ["Communication Services Manager (5)", "07:30–10:30 · 16:00–19:00"], ["LYNC Digital Center (14)", "Closed"], ["Medical Center (4)", "08:00–10:00 · 17:00–19:00"]]}}}}</script>
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <script id="appjs">
 /* Page chrome, rendered from JS so the page can republish itself from constants (never from the live DOM). */
@@ -377,7 +389,7 @@ let preview=null; // a date string when the guest is previewing another day
 
 /* ---------------- shared content: posted by the host, baked into the page itself ---------------- */
 let SHARED={};try{SHARED=JSON.parse(document.getElementById("shared").textContent)||{}}catch(e){}
-SHARED={v:1,updated:0,programs:{},notices:[],allAboard:{},link:"",...SHARED};
+SHARED={v:1,updated:0,programs:{},notices:[],allAboard:{},link:"",days:{},...SHARED};
 let isHost=false,artifactNS=null,publishing=false;
 const DKEY=KEY+"-draft";
 let draft=null;try{draft=JSON.parse(sessionStorage.getItem(DKEY))}catch(e){}
@@ -409,6 +421,33 @@ function qrSvg(text){
   try{const q=qrcode(0,"M");q.addData(text);q.make();const n=q.getModuleCount(),m=2;let d="";
     for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(q.isDark(r,c))d+=`M${c+m} ${r+m}h1v1h-1z`;
     return `<svg viewBox="0 0 ${n+2*m} ${n+2*m}" shape-rendering="crispEdges" role="img" aria-label="QR code for ${esc(text)}"><rect width="100%" height="100%" fill="#FFFFFF"/><path d="${d}" fill="#0E2233"/></svg>`}catch(e){return ""}
+}
+function essentials(date){
+  const D=SHARED.days[date];if(!D)return "";
+  const w=D.weather;
+  return `<section class="sec"><h2>${date===shipParts(Date.now()).date?"Today’s essentials":"Essentials for "+fmtDate(date)}</h2><div class="panel sec ess">
+    ${w?`<div class="wx">${w.hiC!=null?`<b>${w.hiC}°/${w.loC}°C</b>`:""}<span>${esc(w.desc)}${w.hiF!=null?` · ${w.hiF}°/${w.loF}°F`:""}</span></div>`:""}
+    ${D.facts&&D.facts.length?`<dl class="facts">${D.facts.map(([k,v])=>`<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}</dl>`:""}
+    ${D.notes&&D.notes.length?`<ul class="plain">${D.notes.map(n=>`<li><span class="mark"></span><span>${esc(n)}</span></li>`).join("")}</ul>`:""}
+    ${(D.tours&&D.tours.length)||(D.hours&&Object.keys(D.hours).length)?`<p class="small"><a href="#program">Tour meeting times and opening hours →</a></p>`:""}
+  </div></section>`;
+}
+function dayInfo(date){
+  const D=SHARED.days[date];if(!D)return "";let h="";
+  if(D.tours&&D.tours.length)h+=`<section class="panel"><details class="box"><summary>Shore excursion meeting times (${D.tours.length})</summary><dl class="hours">${D.tours.map(t=>`<dt><b>${esc(t.name)}</b><br><span class="small muted">${esc(t.code)}${t.where?" · "+esc(t.where):""}</span></dt><dd>${esc(t.time)}</dd>`).join("")}</dl></details></section>`;
+  for(const k of ["Restaurants","Bars","Services"]){const rows=D.hours&&D.hours[k];if(!rows||!rows.length)continue;
+    h+=`<section class="panel"><details class="box"><summary>${k==="Services"?"Services & facilities":k} hours</summary><dl class="hours">${rows.map(([n,v])=>`<dt>${esc(n)}</dt><dd class="${/closed/i.test(v)?"closed":""}">${esc(v)}</dd>`).join("")}</dl></details></section>`}
+  return h?`<section class="sec"><h2>Around the ship · ${fmtDate(date)}</h2>${h}</section>`:"";
+}
+function cleanDay(x){
+  if(!x||typeof x!=="object")return null;
+  const str=(v,n)=>v==null?"":String(v).slice(0,n),arr=v=>Array.isArray(v)?v:[],num=v=>Number.isFinite(+v)&&v!==null&&v!==""?+v:null;
+  const pairs=(v,n)=>arr(v).filter(q=>Array.isArray(q)&&q[0]).slice(0,n).map(q=>[str(q[0],90),str(q[1],200)]);
+  const w=x.weather&&typeof x.weather==="object"&&x.weather.desc?{desc:str(x.weather.desc,40),hiF:num(x.weather.hiF),loF:num(x.weather.loF),hiC:num(x.weather.hiC),loC:num(x.weather.loC)}:null;
+  const hours={};if(x.hours&&typeof x.hours==="object")for(const k of ["Restaurants","Bars","Services"]){const r=pairs(x.hours[k],40);if(r.length)hours[k]=r}
+  const d={weather:w,facts:pairs(x.facts,12),notes:arr(x.notes).map(n=>str(n,240)).filter(Boolean).slice(0,10),
+    tours:arr(x.tours).filter(t=>t&&t.name).slice(0,40).map(t=>({code:str(t.code,20),name:str(t.name,90),time:str(t.time,8),where:str(t.where,40)})),hours};
+  return (d.weather||d.facts.length||d.notes.length||d.tours.length||Object.keys(hours).length)?d:null;
 }
 function inviteSection(){
   if(!SHARED.link&&!isHost)return "";
@@ -488,6 +527,7 @@ function viewToday(){
     ${day.port&&day.dep?`<form class="form" id="aaform"><label>All aboard in ${esc(PORTS[day.port].name)} (local)<input type="time" id="aa-in" value="${esc(SHARED.allAboard[day.date]||"")}"></label><button class="btn ghost" type="submit" ${publishing?"disabled":""}>Publish all-aboard time</button></form>`:""}
     </section>`;
   }
+  html+=essentials(day.date);
   const cc=clockChangeOn(day.date);
   if(cc)html+=`<div class="panel" style="border-color:var(--sun)"><span class="pill sun">Tonight</span> <b>Clocks go ${cc.to<cc.from?"back":"forward"} one hour</b> at 2:00 (ship time ${offLabel(cc.from)} → ${offLabel(cc.to)}). <span class="muted">Expected. The daily program confirms it.</span></div>`;
 
@@ -513,7 +553,7 @@ function viewToday(){
       <div class="panel sec"><h3>Money</h3><dl class="facts"><dt>Currency</dt><dd>${p.cur==="EUR"?"Euro (€)":p.cur==="MAD"?"Moroccan dirham (MAD)":"US dollar ($)"}</dd><dt>Tipping</dt><dd>${esc(p.tips)}</dd></dl>
       ${p.cur!=="USD"?`<div class="conv"><input type="number" id="conv-amt" value="${p.cur==="MAD"?100:20}" inputmode="decimal" aria-label="Amount in ${p.cur}"><span>${p.cur} ≈</span><b class="mono" id="conv-out"></b><span class="muted small">at <input type="number" step="0.01" id="conv-rate" value="${S.rates[p.cur]}" style="width:70px" aria-label="US dollars per ${p.cur}"> USD each</span></div>`:""}</div>
       <div class="panel sec"><h3>Say it</h3><div class="phr">${p.phrases.map(([a,b])=>`<span>${esc(a)}</span><span>${esc(b)}</span>`).join("")}</div></div>
-      <div class="panel sec"><h3>Weather & light</h3><dl class="facts"><dt>Typical</dt><dd>${p.wx[0]}° / ${p.wx[1]}°C (${Math.round(p.wx[0]*9/5+32)}° / ${Math.round(p.wx[1]*9/5+32)}°F) in late November</dd><dt>Sunrise</dt><dd class="mono">${fmtTZ(sn.rise,p.tz)}</dd><dt>Sunset</dt><dd class="mono">${fmtTZ(sn.set,p.tz)}</dd></dl></div>
+      <div class="panel sec"><h3>Weather & light</h3><dl class="facts">${SHARED.days[day.date]&&SHARED.days[day.date].weather?`<dt>Forecast</dt><dd>${esc(SHARED.days[day.date].weather.desc)}, ${SHARED.days[day.date].weather.hiC}° / ${SHARED.days[day.date].weather.loC}°C</dd>`:`<dt>Typical</dt><dd>${p.wx[0]}° / ${p.wx[1]}°C (${Math.round(p.wx[0]*9/5+32)}° / ${Math.round(p.wx[1]*9/5+32)}°F) in late November</dd>`}<dt>Sunrise</dt><dd class="mono">${fmtTZ(sn.rise,p.tz)}</dd><dt>Sunset</dt><dd class="mono">${fmtTZ(sn.set,p.tz)}</dd></dl></div>
       <div class="panel sec"><h3>Emergency</h3><p class="mono">${esc(p.emergency)}</p><p class="small muted">Write down the port agent’s number from the daily program in the checklist below.</p></div>
     </div></section>`;
     // checklist
@@ -600,7 +640,7 @@ function viewProgram(){
       <div class="snap-cta">${sampleFn&&canImages?`<span class="btn sun filebtn">Take photo<input type="file" id="snapfile" accept="image/*" capture="environment" ${busy?"disabled":""} aria-label="Take a photo of the program"></span><span class="btn ghost filebtn">Choose from library<input type="file" id="pickfile" accept="image/*" multiple ${busy?"disabled":""} aria-label="Choose program photos from your library"></span>${busy?`<button class="btn ghost" data-act="stop">Stop</button>`:""}`:`<span class="status">${sampleFn===false?"Photo reading isn’t available in this view. Add events by hand below.":"Checking photo reading…"}</span>`}</div>
       <div class="status" id="snapstatus" aria-live="polite">${busy?"Reading the program… this can take up to a minute.":""}</div>
       ${d?`<div style="width:100%" class="sec"><div class="sec-head"><h3>Draft: ${d.events.length} events <span class="pill ex">Not published</span></h3></div>
-        <div class="agenda">${d.events.length?eventRows(d.events,{del:true}):`<p class="empty">No events in the draft yet.</p>`}</div>
+        <div class="agenda">${d.events.length?eventRows(d.events,{del:true}):`<p class="empty">No events in the draft yet.</p>`}</div>${d.day&&d.day.facts.length?`<dl class="facts small">${d.day.facts.map(([k,v])=>`<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}</dl>`:""}
         <div class="snap-cta"><button class="btn" data-act="publish-draft" ${publishing||!d.events.length?"disabled":""}>Publish to everyone</button><button class="btn ghost" data-act="discard-draft">Discard draft</button></div></div>`:""}
       <details class="add" style="width:100%"><summary>+ Add an event by hand${d?"":" (starts a draft)"}</summary>
         <form class="form" id="evform"><label>Time<input type="time" id="ev-time" required></label><label>Category<select id="ev-cat">${Object.entries(CATS).map(([k,v])=>`<option value="${k}">${v[0]}</option>`).join("")}</select></label><label class="wide">Event<input type="text" id="ev-title" required placeholder="e.g. Wine tasting"></label><label class="wide">Where<input type="text" id="ev-venue" placeholder="Venue"></label><button class="btn ghost" type="submit">Add to draft</button></form>
@@ -611,6 +651,7 @@ function viewProgram(){
   html+=`<section class="sec"><div class="sec-head"><h3>${fmtDate(date)} ${pr.kind==="posted"?`<span class="pill">Posted</span>`:pr.kind==="example"?`<span class="pill ex">Example program</span>`:""}</h3></div>
   ${pr.kind==="example"?`<p class="small muted">A sample of what a sea-day program looks like. The real ones appear here once they’re posted.</p>`:""}
   <div class="panel"><div class="agenda">${pr.events.length?eventRows(pr.events,{star:true,date}):`<p class="empty">${date>shipParts(Date.now()).date?"Not posted yet. Each day’s program usually goes up the evening before.":"No program was posted for this day."}</p>`}</div></div></section>`;
+  html+=dayInfo(date);
   return html;
 }
 async function readPhotos(files){
@@ -619,15 +660,25 @@ async function readPhotos(files){
   const prompt=`These ${files.length>1?files.length+" photos are pages":"photo is a page"} of a cruise ship's printed daily program for ${fmtDate(date)}, 2026.
 Extract every scheduled activity, meal service, show, talk, class, game and port-related announcement that has a time.
 Reply with only JSON in this shape:
-{"events":[{"time":"HH:MM","end":"HH:MM or null","title":"short name","venue":"venue or null","cat":"food|talk|show|fitness|social|port|other"}],"allAboard":"HH:MM or null"}
-Use 24-hour times. Sort by time. Keep titles short (under 60 characters). Skip advertisements and venue opening-hours tables unless they describe a timed event. Include clock changes and port announcements with cat "port". Do not include personal names, phone numbers or stateroom numbers. Put the printed all-aboard time in "allAboard" if there is one. If the photo is unreadable, return {"events":[],"allAboard":null}.`;
+{"events":[{"time":"HH:MM","end":"HH:MM or null","title":"short name","venue":"venue with deck number, or null","cat":"food|talk|show|fitness|social|port|other"}],
+ "allAboard":"HH:MM or null",
+ "day":{"weather":{"desc":"e.g. Partly sunny","hiF":0,"loF":0,"hiC":0,"loC":0} or null,
+  "facts":[["label","value"]],
+  "notes":["short practical notice"],
+  "tours":[{"code":"excursion code","name":"name","time":"HH:MM meeting time","where":"meeting venue"}],
+  "hours":{"Restaurants":[["venue","HH:MM–HH:MM or Closed"]],"Bars":[["venue","hours"]],"Services":[["service","hours"]]}}}
+Use 24-hour times everywhere. Events in time order; keep titles under 80 characters. Include clock changes, all aboard and sail away as cat "port".
+"facts" are the day's key practical facts as short label/value pairs, such as: All aboard, Pier, Shuttle, Take ashore, Port agent (company and phone numbers), Dress tonight, Clock change, Onboard emergency numbers.
+"notes" are short practical notices (taxes, closures, maintenance, reservations), rewritten in plain words. Do not copy long descriptive or marketing passages, and skip advertisements and sales offers.
+Do not include guests' names or stateroom numbers. Ignore handwriting and pen marks on the page.
+If something is not printed, leave it empty. If the photo is unreadable, return {"events":[],"allAboard":null,"day":null}.`;
   let msg="";
   try{
     const res=await sampleFn.json(prompt,{images:Array.from(files).slice(0,8),signal:ctl.signal});
     const hhmm=v=>/^\d{1,2}:\d{2}$/.test(v||"")?String(v).padStart(5,"0"):null;
     const evs=(res&&Array.isArray(res.events)?res.events:[]).filter(e=>e&&e.title).map(e=>({id:uid(),time:hhmm(e.time)||"",end:hhmm(e.end),title:String(e.title).slice(0,90),venue:e.venue?String(e.venue).slice(0,60):null,cat:CATS[e.cat]?e.cat:"other"})).sort((a,b)=>a.time.localeCompare(b.time));
-    draft={date,events:evs,allAboard:hhmm(res&&res.allAboard),created:Date.now()};saveDraft();
-    msg=evs.length?`Read ${evs.length} events${draft.allAboard?` and all aboard at ${draft.allAboard}`:""}. Check them, remove anything wrong, then publish.`:"No events could be read. Try a sharper, flatter photo.";
+    draft={date,events:evs,allAboard:hhmm(res&&res.allAboard),day:cleanDay(res&&res.day),created:Date.now()};saveDraft();
+    msg=evs.length?`Read ${evs.length} events${draft.allAboard?`, all aboard at ${draft.allAboard}`:""}${draft.day?`, plus ${[draft.day.weather?"the forecast":"",draft.day.facts.length?draft.day.facts.length+" key facts":"",draft.day.tours.length?draft.day.tours.length+" tour times":"",Object.values(draft.day.hours).flat().length?Object.values(draft.day.hours).flat().length+" opening hours":""].filter(Boolean).join(", ")}`:""}. Check them, remove anything wrong, then publish.`:"No events could be read. Try a sharper, flatter photo.";
   }catch(e){
     const c=e&&e.code;
     msg={cancelled:"",not_granted:"Photo reading needs your OK to use Claude.",sampling_disabled:"Photo reading isn’t available on this account.",rate_limited:"Too many requests just now. Try again in a few minutes.",image_rejected:"That file couldn’t be read. Try a JPEG or PNG photo.",invalid_json:"The photo was read, but the result came back garbled. Try again.",refused:"That photo couldn’t be processed. Try another shot.",images_unavailable:"Photos can’t be sent from this view."}[c]??"Something interrupted the reading. Check the connection and try again.";
@@ -703,8 +754,8 @@ document.addEventListener("click",e=>{
   if(act==="stop"&&busy){busy.abort()}
   if(act==="copylink"){const txt=SHARED.link;const done=()=>toast("Link copied.");try{navigator.clipboard.writeText(txt).then(done,()=>{selectText("sharelink")})}catch(_){selectText("sharelink")}}
   if(act==="discard-draft"){draft=null;saveDraft();render()}
-  if(act==="publish-draft"&&draft){const d=draft;pushShared(n=>{n.programs[d.date]={events:d.events,at:Date.now()};if(d.allAboard&&dayOf(d.date)&&dayOf(d.date).port)n.allAboard[d.date]=d.allAboard},`Publishing the program for ${fmtDate(d.date)}`)}
-  if(act==="unpublish"){const date=progDate||curDay().date;pushShared(n=>{delete n.programs[date]},"Removing the program")}
+  if(act==="publish-draft"&&draft){const d=draft;pushShared(n=>{n.programs[d.date]={events:d.events,at:Date.now()};if(d.day)n.days[d.date]=d.day;if(d.allAboard&&dayOf(d.date)&&dayOf(d.date).port)n.allAboard[d.date]=d.allAboard},`Publishing the program for ${fmtDate(d.date)}`)}
+  if(act==="unpublish"){const date=progDate||curDay().date;pushShared(n=>{delete n.programs[date];delete n.days[date]},"Removing the program")}
   if(b.dataset.deldraft&&draft){draft.events=draft.events.filter(x=>x.id!==b.dataset.deldraft);saveDraft();render()}
   if(b.dataset.delnote){const id=b.dataset.delnote;pushShared(n=>{n.notices=n.notices.filter(x=>x.id!==id)},"Removing the notice")}
   if(act==="clearex-plans"){S.plans=S.plans.filter(p=>!p.ex);save();render()}
