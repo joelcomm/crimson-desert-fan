@@ -379,34 +379,19 @@ function position(ms){
 /* ---------------- state (kept on this device only) ---------------- */
 const KEY="bcn-mia-allura-2026";
 const uid=()=>Math.random().toString(36).slice(2,9);
-const EXAMPLE_PROGRAM=[
-  {time:"07:30",title:"Sunrise stretch",venue:"Pool deck",cat:"fitness"},
-  {time:"09:00",title:"Coffee and pastries",venue:"Baristas",cat:"food"},
-  {time:"10:00",title:"Port talk: Agadir and Arrecife",venue:"Main theatre",cat:"talk"},
-  {time:"11:00",title:"Cooking class: Moroccan tagines",venue:"Culinary Center",cat:"talk"},
-  {time:"12:30",title:"Mediterranean lunch buffet",venue:"Terrace Café",cat:"food"},
-  {time:"14:00",title:"Watercolour workshop",venue:"Artist Loft",cat:"social"},
-  {time:"16:00",title:"Afternoon tea with string quartet",venue:"Horizons",cat:"food"},
-  {time:"17:00",title:"Team trivia",venue:"Martinis",cat:"social"},
-  {time:"21:30",title:"Production show",venue:"Main theatre",cat:"show"}
-];
 const CATS={food:["Food & drink","#E39B0B"],talk:["Talks & classes","#2A86A0"],show:["Shows","#B0508F"],fitness:["Fitness & spa","#3E9B62"],social:["Games & social","#6C6FD0"],port:["Port & tours","#C9653A"],other:["Other","#8A97A1"]};
 const PLAN_TYPES=["Dining","Excursion","Spa","Meet-up","Program","Other"];
 const SPEND_CATS=["Bar","Spa","Shops","Excursions","Wi-Fi","Other"];
 function defaultState(){return {
-  plans:[
-    {id:uid(),date:"2026-11-19",time:"19:30",title:"Dinner at Toscana",type:"Dining",where:"Deck 5",ex:true},
-    {id:uid(),date:"2026-11-21",time:"08:30",title:"Kasbah & souk tour",type:"Excursion",where:"Meet in the main theatre",ex:true},
-    {id:uid(),date:"2026-11-24",time:"17:00",title:"Drinks with the couple from Denver",type:"Meet-up",where:"Martinis",ex:true}
-  ],
+  plans:[],
+
   programs:{}, check:{}, agent:{},
-  spend:{obc:300,items:[
-    {id:uid(),date:"2026-11-17",amount:42,cat:"Bar",note:"Sail-away cocktails",ex:true},
-    {id:uid(),date:"2026-11-18",amount:189,cat:"Spa",note:"Massage",ex:true}
-  ]},
+  spend:{obc:0,items:[]},
   rates:{EUR:1.16,MAD:0.10}
 }}
 let S;try{S=JSON.parse(localStorage.getItem(KEY))||defaultState()}catch(e){S=defaultState()}
+/* Earlier versions seeded sample plans and charges; drop them. */
+try{S.plans=(S.plans||[]).filter(p=>!p.ex);if(S.spend)S.spend.items=(S.spend.items||[]).filter(i=>!i.ex)}catch(e){}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 let preview=null; // a date string when the guest is previewing another day
 
@@ -572,10 +557,10 @@ function viewToday(){
   const planEnd=i=>{const a=toMin(i.time);return i.end&&toMin(i.end)>a?toMin(i.end):a+60};
   const isPast=i=>day.date<nd.date||(day.date===nd.date&&/^\d{2}:\d{2}$/.test(i.time||"")&&nd.min>=planEnd(i));
   const pastItems=allItems.filter(isPast),items=allItems.filter(i=>!isPast(i));
-  const planRow=i=>`<div class="row dim"><div class="t">${esc(i.time||"—")}</div><div class="body"><b>${esc(i.title)}</b><span>${esc(i.type)}${i.where?" · "+esc(i.where):""}</span></div><div>${i.ex?'<span class="pill ex">Example</span>':""}</div></div>`;
+  const planRow=i=>`<div class="row dim"><div class="t">${esc(i.time||"—")}</div><div class="body"><b>${esc(i.title)}</b><span>${esc(i.type)}${i.where?" · "+esc(i.where):""}</span></div><div></div></div>`;
   const upcoming=items.find(i=>i.time&&shipInstant(i.date,i.time)>t);
   html+=`<section class="sec"><div class="sec-head"><h2>Your day</h2><a class="linkbtn" href="#plans">Add plans</a></div><div class="panel"><div class="agenda">${
-    (pastItems.length?`<details class="box earlier"><summary>${day.date<nd.date?"Done":"Earlier today"} (${pastItems.length})</summary><div class="agenda">${pastItems.map(planRow).join("")}</div></details>`:"")+(items.length?items.map(i=>`<div class="row ${i===upcoming?"next":""}"><div class="t">${esc(i.time||"—")}${i===upcoming?`<small data-cdtext="${shipInstant(i.date,i.time)}">in ${durText(shipInstant(i.date,i.time)-t)}</small>`:""}</div><div class="body"><b>${esc(i.title)}</b><span>${esc(i.type)}${i.where?" · "+esc(i.where):""}</span></div><div>${i.ex?'<span class="pill ex">Example</span>':""}</div></div>`).join("")
+    (pastItems.length?`<details class="box earlier"><summary>${day.date<nd.date?"Done":"Earlier today"} (${pastItems.length})</summary><div class="agenda">${pastItems.map(planRow).join("")}</div></details>`:"")+(items.length?items.map(i=>`<div class="row ${i===upcoming?"next":""}"><div class="t">${esc(i.time||"—")}${i===upcoming?`<small data-cdtext="${shipInstant(i.date,i.time)}">in ${durText(shipInstant(i.date,i.time)-t)}</small>`:""}</div><div class="body"><b>${esc(i.title)}</b><span>${esc(i.type)}${i.where?" · "+esc(i.where):""}</span></div><div></div></div>`).join("")
     :(pastItems.length?`<p class="empty">Nothing else planned today.</p>`:`<p class="empty">Nothing planned yet. Star events in the <a href="#program">daily program</a> or add a reservation in <a href="#plans">My plans</a>.</p>`))}</div></div></section>`;
 
   // port guide
@@ -652,7 +637,6 @@ function viewVoyage(){
 
 /* ---------------- PROGRAM ---------------- */
 let progDate=null,sampleFn=null,canImages=false,busy=null;
-const exampleEvents=()=>EXAMPLE_PROGRAM.map((e,i)=>({...e,id:"ex"+i}));
 /* Minutes since midnight, ship time, and whether a given date is "today" at the current moment (live or previewed). */
 function nowShip(){const sp=shipParts(now());return {date:sp.date,min:toMin(sp.time)}}
 function evEnd(e){const a=toMin(e.time);return e.end&&toMin(e.end)>a?toMin(e.end):a+(e.cat==="port"?10:30)}
@@ -680,7 +664,6 @@ function eventRows(events,{star,del,date,live,dim}){
 }
 function programFor(date){
   if(SHARED.programs[date])return {events:SHARED.programs[date].events,kind:"posted"};
-  if(!Object.keys(SHARED.programs).length)return {events:exampleEvents(),kind:"example"};
   return {events:[],kind:"none"};
 }
 function viewProgram(){
@@ -702,8 +685,7 @@ function viewProgram(){
       ${SHARED.programs[date]&&!d?`<button class="linkbtn" data-act="unpublish">Remove the posted program for this day</button>`:""}
     </section>`;
   }
-  html+=`<section class="sec"><div class="sec-head"><h3>${fmtDate(date)} ${pr.kind==="posted"?`<span class="pill">Posted</span>`:pr.kind==="example"?`<span class="pill ex">Example program</span>`:""}</h3></div>
-  ${pr.kind==="example"?`<p class="small muted">A sample of what a sea-day program looks like. The real ones appear here once they’re posted.</p>`:""}
+  html+=`<section class="sec"><div class="sec-head"><h3>${fmtDate(date)} ${pr.kind==="posted"?`<span class="pill">Posted</span>`:""}</h3></div>
   <div class="panel"><div class="agenda">${pr.events.length?liveList(pr.events,date):`<p class="empty">${date>shipParts(Date.now()).date?"Not posted yet. Each day’s program usually goes up the evening before.":"No program was posted for this day."}</p>`}</div></div></section>`;
   html+=dayInfo(date);
   return html;
@@ -745,7 +727,7 @@ If something is not printed, leave it empty. If the photo is unreadable, return 
 function viewPlans(){
   const dates=[...new Set(S.plans.map(p=>p.date))].sort();
   const anyEx=S.plans.some(p=>p.ex);
-  return `<section class="sec"><div class="sec-head"><h2>My plans</h2>${anyEx?`<button class="linkbtn" data-act="clearex-plans">Remove examples</button>`:""}</div>
+  return `<section class="sec"><div class="sec-head"><h2>My plans</h2></div>
   <div class="panel"><details class="add" ${S.plans.length?"":"open"}><summary>+ Add a reservation or plan</summary>
     <form class="form" id="planform">
       <label>Day<select id="pl-date">${DAYS.map(d=>`<option value="${d.date}" ${d.date===curDay().date?"selected":""}>${fmtDate(d.date)}: ${d.sea?"At sea":esc(PORTS[d.port].name)}</option>`).join("")}</select></label>
@@ -755,7 +737,7 @@ function viewPlans(){
       <label class="wide">Where / notes<input type="text" id="pl-where" placeholder="Venue, meeting point, confirmation #"></label>
       <button class="btn" type="submit">Save plan</button>
     </form></details></div>
-  ${dates.length?dates.map(d=>{const dd=dayOf(d);return `<div class="sec"><div class="sec-head"><h3>${fmtDate(d)} · ${dd.sea?"At sea":esc(PORTS[dd.port].name)}</h3></div><div class="panel"><div class="agenda">${plansOn(d).map(i=>`<div class="row"><div class="t">${esc(i.time||"—")}</div><div class="body"><b>${esc(i.title)}</b><span>${esc(i.type)}${i.where?" · "+esc(i.where):""}</span></div><div>${i.ex?'<span class="pill ex">Example</span>':""}<button class="x" data-delplan="${i.id}" aria-label="Remove ${esc(i.title)}">×</button></div></div>`).join("")}</div></div></div>`}).join(""):`<p class="empty">No plans yet. Add specialty dining, excursions and spa times so they all show up on the Today screen.</p>`}
+  ${dates.length?dates.map(d=>{const dd=dayOf(d);return `<div class="sec"><div class="sec-head"><h3>${fmtDate(d)} · ${dd.sea?"At sea":esc(PORTS[dd.port].name)}</h3></div><div class="panel"><div class="agenda">${plansOn(d).map(i=>`<div class="row"><div class="t">${esc(i.time||"—")}</div><div class="body"><b>${esc(i.title)}</b><span>${esc(i.type)}${i.where?" · "+esc(i.where):""}</span></div><div><button class="x" data-delplan="${i.id}" aria-label="Remove ${esc(i.title)}">×</button></div></div>`).join("")}</div></div></div>`}).join(""):`<p class="empty">No plans yet. Add specialty dining, excursions and spa times so they all show up on the Today screen.</p>`}
   </section>`;
 }
 
@@ -867,7 +849,7 @@ document.addEventListener("click",e=>{
     const date=progDate||curDay().date,id=b.dataset.star;
     const existing=S.plans.find(p=>p.ev===id&&p.date===date);
     if(existing)S.plans=S.plans.filter(p=>p!==existing);
-    else{const pr=programFor(date);const ev=pr.events.find(x=>x.id===id);if(ev)S.plans.push({id:uid(),date,time:ev.time,end:ev.end||null,title:ev.title,type:"Program",where:ev.venue||"",ev:id,ex:pr.kind==="example"})}
+    else{const pr=programFor(date);const ev=pr.events.find(x=>x.id===id);if(ev)S.plans.push({id:uid(),date,time:ev.time,end:ev.end||null,title:ev.title,type:"Program",where:ev.venue||"",ev:id})}
     save();render();
   }
   if(b.dataset.delplan){S.plans=S.plans.filter(p=>p.id!==b.dataset.delplan);save();render()}
